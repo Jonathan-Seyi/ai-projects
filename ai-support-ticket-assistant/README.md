@@ -20,3 +20,7 @@ pip install -r requirements.txt
 cp .env.example .env
 streamlit run app.py
 ```
+
+## Demo
+
+![Support Ticket Assistant Demo](./support-ticket-demo.png)
