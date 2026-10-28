@@ -37,8 +37,17 @@ A simple Retrieval-Augmented Generation system that:
 
 ---
 
+### 💼 Application Atlas — Job Application Tracker
+A responsive, offline-first JavaScript dashboard for tracking job applications, interviews and offers, with local storage, search/filter tools, and safe CSV export.
+
+👉 [View Project](./job-application-tracker)
+
+---
+
 ## 🛠 Tech Stack
 - Python  
+- JavaScript (ES modules)  
+- HTML / CSS  
 - Streamlit  
 - OpenAI API (LLMs)  
 - Prompt Engineering  

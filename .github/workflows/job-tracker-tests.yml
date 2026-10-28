@@ -1,0 +1,31 @@
+name: Job tracker checks
+
+on:
+  push:
+    paths:
+      - "job-application-tracker/**"
+      - ".github/workflows/job-tracker-tests.yml"
+  pull_request:
+    paths:
+      - "job-application-tracker/**"
+      - ".github/workflows/job-tracker-tests.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check JavaScript syntax
+        run: |
+          node --check job-application-tracker/tracker.mjs
+          node --check job-application-tracker/app.mjs
+          node --check job-application-tracker/tracker.test.mjs
+      - name: Run unit tests
+        run: node --test job-application-tracker/tracker.test.mjs
