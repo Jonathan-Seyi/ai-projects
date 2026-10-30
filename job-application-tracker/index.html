@@ -104,7 +104,11 @@
           <div id="application-list" class="application-list" aria-live="polite"></div>
           <p id="empty-state" class="empty-state">No applications yet. Add your first application to start tracking.</p>
           <div class="list-footer">
-            <button id="export-button" type="button" class="secondary-button" disabled>↓ Export CSV</button>
+            <div class="backup-actions">
+              <button id="import-button" type="button" class="secondary-button">↑ Import CSV</button>
+              <input id="import-file" type="file" accept=".csv,text/csv" hidden aria-label="Choose a CSV file to import">
+              <button id="export-button" type="button" class="secondary-button" disabled>↓ Export CSV</button>
+            </div>
             <button id="clear-button" type="button" class="text-button" disabled>Clear all</button>
           </div>
         </section>

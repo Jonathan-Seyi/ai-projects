@@ -2,6 +2,7 @@ import {
   STATUSES, normalizeApplication, loadApplications, filterApplications,
   getStats, changeStatus, toCsv
 } from "./tracker.mjs";
+import { importApplications, MAX_CSV_CHARS } from "./import-csv.mjs";
 
 const STORAGE_KEY = "portfolio-job-tracker-v1";
 const form = document.querySelector("#application-form");
@@ -12,6 +13,8 @@ const statusFilter = document.querySelector("#status-filter");
 const feedback = document.querySelector("#feedback");
 const resultCount = document.querySelector("#result-count");
 const exportButton = document.querySelector("#export-button");
+const importButton = document.querySelector("#import-button");
+const importFile = document.querySelector("#import-file");
 const clearButton = document.querySelector("#clear-button");
 const dateInput = document.querySelector("#date");
 const countFields = {
@@ -128,13 +131,17 @@ function render() {
   clearButton.disabled = applications.length === 0;
 }
 
+function newApplicationId() {
+  return typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   try {
     const values = new FormData(form);
-    const id = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-      ? crypto.randomUUID()
-      : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const id = newApplicationId();
     const application = normalizeApplication({
       id,
       company: values.get("company"),
@@ -168,6 +175,37 @@ exportButton.addEventListener("click", () => {
   anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   notify("CSV export downloaded.");
+});
+
+importButton.addEventListener("click", () => importFile.click());
+
+importFile.addEventListener("change", async () => {
+  const file = importFile.files?.[0];
+  if (!file) return;
+  try {
+    if (file.size > MAX_CSV_CHARS) {
+      throw new Error("Choose a CSV file smaller than 1 MB.");
+    }
+    const result = importApplications(await file.text(), applications, newApplicationId);
+    const summary = "Imported " + result.added + " application(s). " +
+      result.skippedDuplicates + " duplicate(s) skipped. " +
+      result.invalidRows + " invalid row(s) skipped.";
+    if (result.added > 0) {
+      // Save first: failed storage must not replace the in-memory dashboard.
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(result.applications));
+      } catch {
+        throw new Error("Browser storage is full or unavailable. Nothing was imported.");
+      }
+      applications = result.applications;
+      render();
+    }
+    notify(summary + (result.errors.length ? " " + result.errors.join(" ") : ""), result.invalidRows > 0);
+  } catch (error) {
+    notify("CSV import failed: " + (error.message || "Unable to read file."), true);
+  } finally {
+    importFile.value = "";
+  }
 });
 
 clearButton.addEventListener("click", () => {
