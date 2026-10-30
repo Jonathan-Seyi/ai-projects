@@ -27,5 +27,7 @@ jobs:
           node --check job-application-tracker/tracker.mjs
           node --check job-application-tracker/app.mjs
           node --check job-application-tracker/tracker.test.mjs
+          node --check job-application-tracker/import-csv.mjs
+          node --check job-application-tracker/import-csv.test.mjs
       - name: Run unit tests
-        run: node --test job-application-tracker/tracker.test.mjs
+        run: node --test job-application-tracker/tracker.test.mjs job-application-tracker/import-csv.test.mjs
