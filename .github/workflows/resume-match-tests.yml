@@ -1,0 +1,30 @@
+name: Resume match Python tests
+
+on:
+  push:
+    paths:
+      - "ai-resume-match/**"
+      - ".github/workflows/resume-match-tests.yml"
+  pull_request:
+    paths:
+      - "ai-resume-match/**"
+      - ".github/workflows/resume-match-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile Python sources
+        run: python -m compileall -q ai-resume-match/app.py ai-resume-match/match_core.py ai-resume-match/tests
+      - name: Run dependency-free unit tests
+        working-directory: ai-resume-match
+        run: python -m unittest discover -s tests -v
