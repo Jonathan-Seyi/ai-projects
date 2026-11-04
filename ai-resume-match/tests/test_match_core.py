@@ -65,6 +65,42 @@ class MatchTests(unittest.TestCase):
         self.assertEqual(heuristic_match("JavaScript", "JS")["score"], 100)
 
 
+
+class MultiWordSkillTests(unittest.TestCase):
+    def test_phrase_is_single_keyword(self):
+        self.assertEqual(extract_keywords("Machine learning and SQL Server"),
+                         ["machine learning", "sql server"])
+
+    def test_hyphenated_phrase(self):
+        self.assertEqual(extract_keywords("machine-learning and unit-testing"),
+                         ["machine learning", "unit testing"])
+
+    def test_rest_api_aliases(self):
+        self.assertEqual(extract_keywords("RESTful APIs, REST API"),
+                         ["rest api", "rest api"])
+
+    def test_no_substring_matching(self):
+        self.assertNotIn("sql server", extract_keywords("nosql serverless"))
+
+    def test_phrase_coverage(self):
+        self.assertEqual(heuristic_match("Built SQL Server apps", "SQL Server")["score"], 100)
+
+    def test_partial_word_is_not_full_phrase(self):
+        self.assertEqual(heuristic_match("SQL", "SQL Server")["score"], 0)
+
+    def test_aspnet_core_is_one_term(self):
+        self.assertEqual(extract_keywords("ASP.NET Core"), ["asp.net core"])
+
+    def test_repeating_phrase_does_not_inflate_coverage(self):
+        result = heuristic_match("SQL Server " * 10, "SQL Server and unit testing")
+        self.assertEqual(result["score"], 50)
+
+    def test_other_phrases_are_recognized(self):
+        self.assertEqual(extract_keywords("Spring Boot, Power BI, continuous integration"),
+                         ["spring boot", "power bi", "continuous integration"])
+
+
+
 class AIValidationTests(unittest.TestCase):
     def test_valid_result_is_sanitized(self):
         raw = {"score": 70, "strengths": [" Python ", ""], "gaps": [],
