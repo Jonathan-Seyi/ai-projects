@@ -17,8 +17,16 @@ STOP_WORDS = frozenset("""
 """.split())
 
 # Keep technology names with punctuation intact (e.g., C++, C#, .NET).
+# Match multi-word technology names before single words to avoid counting
+# their individual components as separate job requirements.
+PHRASES = (
+    r"machine[\\s-]+learning|data[\\s-]+analysis|sql[\\s-]+server|"
+    r"unit[\\s-]+testing|spring[\\s-]+boot|power[\\s-]+bi|"
+    r"continuous[\\s-]+integration|asp\\.net[\\s-]+core|rest(?:ful)?[\\s-]+apis?"
+)
 TOKEN_PATTERN = re.compile(
-    r"(?<![a-z0-9_])(?:asp\.net|node\.js|\.net|c\+\+|c#|[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*)(?![a-z0-9_])",
+    r"(?<![a-z0-9_])(?:" + PHRASES +
+    r"|asp\\.net|node\\.js|\\.net|c\\+\\+|c#|[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*)(?![a-z0-9_])",
     re.IGNORECASE,
 )
 ALIASES = {
@@ -29,13 +37,20 @@ ALIASES = {
     "csharp": "c#",
     "cplusplus": "c++",
     "postgres": "postgresql",
+    "restful api": "rest api",
+    "rest apis": "rest api",
+    "restful apis": "rest api",
 }
 
 
 def extract_keywords(text: str) -> list[str]:
-    """Return normalized, meaningful keywords in their original order."""
-    tokens = (ALIASES.get(word.lower(), word.lower()) for word in TOKEN_PATTERN.findall(text))
-    return [word for word in tokens if word not in STOP_WORDS and len(word) > 1]
+    """Return normalized keywords, preserving recognized multi-word skills."""
+    tokens = (
+        re.sub(r"[\\s-]+", " ", word.lower())
+        for word in TOKEN_PATTERN.findall(text)
+    )
+    return [ALIASES.get(word, word) for word in tokens
+            if word not in STOP_WORDS and len(word) > 1]
 
 
 def heuristic_match(resume: str, job: str, max_terms: int = 20) -> dict:
