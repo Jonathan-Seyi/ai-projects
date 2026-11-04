@@ -20,13 +20,13 @@ STOP_WORDS = frozenset("""
 # Match multi-word technology names before single words to avoid counting
 # their individual components as separate job requirements.
 PHRASES = (
-    r"machine[\\s-]+learning|data[\\s-]+analysis|sql[\\s-]+server|"
-    r"unit[\\s-]+testing|spring[\\s-]+boot|power[\\s-]+bi|"
-    r"continuous[\\s-]+integration|asp\\.net[\\s-]+core|rest(?:ful)?[\\s-]+apis?"
+    r"machine[\s-]+learning|data[\s-]+analysis|sql[\s-]+server|"
+    r"unit[\s-]+testing|spring[\s-]+boot|power[\s-]+bi|"
+    r"continuous[\s-]+integration|asp\.net[\s-]+core|rest(?:ful)?[\s-]+apis?"
 )
 TOKEN_PATTERN = re.compile(
     r"(?<![a-z0-9_])(?:" + PHRASES +
-    r"|asp\\.net|node\\.js|\\.net|c\\+\\+|c#|[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*)(?![a-z0-9_])",
+    r"|asp\.net|node\.js|\.net|c\+\+|c#|[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*)(?![a-z0-9_])",
     re.IGNORECASE,
 )
 ALIASES = {
