@@ -46,7 +46,7 @@ ALIASES = {
 def extract_keywords(text: str) -> list[str]:
     """Return normalized keywords, preserving recognized multi-word skills."""
     tokens = (
-        re.sub(r"[\\s-]+", " ", word.lower())
+        re.sub(r"[\s-]+", " ", word.lower())
         for word in TOKEN_PATTERN.findall(text)
     )
     return [ALIASES.get(word, word) for word in tokens
