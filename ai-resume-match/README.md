@@ -5,6 +5,7 @@ A privacy-conscious **Streamlit** demo for comparing a resume with a job descrip
 ## Features
 
 - **Offline-by-default keyword mode:** compares up to 20 distinct, frequent job-description terms with resume text. Handles technology names such as `C++`, `C#`, `.NET`, `ASP.NET`, and `Node.js`, and normalizes common aliases like `JS` and `JavaScript`.
+- **Multi-word skills:** recognizes phrases such as `machine learning`, `SQL Server`, `ASP.NET Core`, `unit testing`, `Spring Boot`, `Power BI`, `continuous integration`, and REST API variants as individual requirements rather than counting their component words separately. This is a curated list, not universal skill recognition.
 - **Transparent scoring:** shows matched terms, total terms considered, and how coverage is calculated. Repeating a keyword does not inflate the score.
 - **Honest resume suggestions:** prompts you to add examples only when they reflect actual experience, rather than inventing qualifications.
 - **Optional AI mode:** an opt-in checkbox appears only when an API key is configured. AI output is validated before display; failures fall back to local analysis.
@@ -66,5 +67,6 @@ These tests cover the pure matching functions and AI result validation. They **d
 - [x] Add explicit consent before sending resume data to an external AI API.
 - [x] Add unit tests and CI.
 - [ ] Evaluate keyword recall on anonymized sample job postings.
-- [ ] Add optional multi-word skill phrases and explainable synonym mappings.
+- [x] Add curated multi-word skill phrases and explainable REST API synonym mappings.
+- [ ] Expand the skill phrase list based on measured results from anonymized job postings.
 - [ ] Add Streamlit UI smoke tests without sending private documents to an API.
