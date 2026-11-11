@@ -48,12 +48,17 @@ async function readJson(req) {
   const type = req.headers['content-type'] ?? '';
   if (!/^application\/json(?:\s*;|$)/i.test(type)) throw { status: 415, message: 'Content-Type must be application/json' };
   let bytes = 0;
+  let oversized = false;
   const chunks = [];
   for await (const chunk of req) {
     bytes += chunk.length;
-    if (bytes > MAX_BODY_BYTES) throw { status: 413, message: 'Request body too large' };
+    if (bytes > MAX_BODY_BYTES) {
+      oversized = true;
+      continue; // Drain the request before responding to avoid a connection reset.
+    }
     chunks.push(chunk);
   }
+  if (oversized) throw { status: 413, message: 'Request body too large' };
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); }
   catch { throw { status: 400, message: 'Malformed JSON' }; }
 }
