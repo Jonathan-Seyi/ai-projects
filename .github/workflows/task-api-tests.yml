@@ -1,0 +1,24 @@
+name: Task API tests
+
+on:
+  push:
+    paths:
+      - 'task-api/**'
+      - '.github/workflows/task-api-tests.yml'
+  pull_request:
+    paths:
+      - 'task-api/**'
+      - '.github/workflows/task-api-tests.yml'
+
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run Task API tests
+        working-directory: task-api
+        run: npm test
