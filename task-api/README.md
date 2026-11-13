@@ -5,6 +5,7 @@ A small **dependency-free Node.js REST API** for managing tasks. Built to demons
 ## Features
 
 - Create, list, retrieve, update and delete tasks.
+- Filter task lists by status and page through results with validated `limit` (1–100) and `offset` (0–1,000,000) parameters.
 - Validates titles (1–120 nonblank characters), statuses (`todo`, `doing`, `done`) and allowed JSON fields.
 - Returns meaningful HTTP statuses (`200`, `201`, `400`, `404`, `405`, `413`, `415`, `422`).
 - Limits request bodies to 16 KiB and sends JSON responses with no-store cache headers.
@@ -26,7 +27,7 @@ The server listens at `http://127.0.0.1:3000`. Override with `PORT=4000 npm star
 | Method | Route | Description |
 | --- | --- | --- |
 | GET | `/health` | Health check |
-| GET | `/tasks` | List tasks |
+| GET | `/tasks` | List tasks; optional `status`, `limit`, `offset` query parameters |
 | POST | `/tasks` | Create task |
 | GET | `/tasks/:id` | Retrieve task |
 | PATCH | `/tasks/:id` | Change title or status |
@@ -39,6 +40,14 @@ curl -X POST http://127.0.0.1:3000/tasks -H 'Content-Type: application/json' -d 
 ```
 
 A successful response includes a generated UUID. Use it in `GET /tasks/<id>`, `PATCH /tasks/<id>` or `DELETE /tasks/<id>`.
+
+## Filter and paginate tasks
+
+```bash
+curl 'http://127.0.0.1:3000/tasks?status=doing&limit=10&offset=0'
+```
+
+When query parameters are supplied, the response includes `tasks` and `pagination` with `total`, `limit`, `offset`, and `hasMore`. Without parameters, the original `{ "tasks": [...] }` response is preserved for existing clients. Invalid or duplicate parameters return HTTP 400. Ordering follows task creation order; all data remains in memory.
 
 ## Tests
 
