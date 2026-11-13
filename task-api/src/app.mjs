@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
+import { parseTaskQuery, queryTasks } from './task-query.mjs';
 
 const MAX_BODY_BYTES = 16 * 1024;
 const STATUSES = new Set(['todo', 'doing', 'done']);
@@ -67,12 +68,19 @@ export function createApp(store = createTaskStore()) {
   return createServer(async (req, res) => {
     const method = req.method;
     let path;
-    try { path = new URL(req.url, 'http://localhost').pathname; }
+    let url;
+    try { url = new URL(req.url, 'http://localhost'); path = url.pathname; }
     catch { return send(res, 400, { error: 'Invalid URL' }); }
     try {
       if (path === '/health' && method === 'GET') return send(res, 200, { status: 'ok' });
       if (path === '/tasks') {
-        if (method === 'GET') return send(res, 200, { tasks: store.list() });
+        if (method === 'GET') {
+          if (!url.search) return send(res, 200, { tasks: store.list() });
+          let query;
+          try { query = parseTaskQuery(url.searchParams); }
+          catch (error) { return send(res, 400, { error: error.message }); }
+          return send(res, 200, queryTasks(store.list(), query));
+        }
         if (method === 'POST') {
           const input = await readJson(req);
           const error = validateTask(input);
