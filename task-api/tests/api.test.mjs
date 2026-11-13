@@ -76,3 +76,17 @@ test('unknown routes and methods return explicit errors', async () => {
   assert.equal((await request('/tasks', 'PUT')).status, 405);
   assert.equal((await request('/health', 'POST')).status, 404);
 });
+
+test('GET tasks supports filtered pages and rejects invalid query parameters', async () => {
+  const first = await request('/tasks', 'POST', { title: 'Pagination example', status: 'doing' });
+  assert.equal(first.status, 201);
+  const filtered = await request('/tasks?status=doing&limit=1&offset=0');
+  assert.equal(filtered.status, 200);
+  assert.equal(filtered.body.pagination.limit, 1);
+  assert.ok(filtered.body.pagination.total >= 1);
+  assert.ok(filtered.body.tasks.every(task => task.status === 'doing'));
+  assert.equal((await request('/tasks?limit=0')).status, 400);
+  assert.equal((await request('/tasks?status=doing&status=done')).status, 400);
+  assert.equal((await request('/tasks?unknown=1')).status, 400);
+  assert.ok(Array.isArray((await request('/tasks')).body.tasks));
+});
