@@ -1,0 +1,59 @@
+[
+  {
+    "id": "punctuation",
+    "text": "C++ C# .NET",
+    "expected": [
+      "c++",
+      "c#",
+      ".net"
+    ]
+  },
+  {
+    "id": "phrases",
+    "text": "SQL Server and machine learning",
+    "expected": [
+      "sql server",
+      "machine learning"
+    ]
+  },
+  {
+    "id": "hyphens",
+    "text": "unit-testing and continuous-integration",
+    "expected": [
+      "unit testing",
+      "continuous integration"
+    ]
+  },
+  {
+    "id": "aliases",
+    "text": "JS NodeJS Postgres",
+    "expected": [
+      "javascript",
+      "node.js",
+      "postgresql"
+    ]
+  },
+  {
+    "id": "rest",
+    "text": "RESTful APIs",
+    "expected": [
+      "rest api"
+    ]
+  },
+  {
+    "id": "context",
+    "text": "We are looking for a candidate with experience in Python",
+    "expected": [
+      "python"
+    ]
+  },
+  {
+    "id": "frameworks",
+    "text": "ASP.NET Core Spring Boot Power BI",
+    "expected": [
+      "asp.net core",
+      "spring boot",
+      "power bi"
+    ]
+  }
+]
