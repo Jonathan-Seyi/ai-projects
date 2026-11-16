@@ -9,7 +9,7 @@ A small **dependency-free Node.js REST API** for managing tasks. Built to demons
 - Validates titles (1–120 nonblank characters), statuses (`todo`, `doing`, `done`) and allowed JSON fields.
 - Returns meaningful HTTP statuses (`200`, `201`, `400`, `404`, `405`, `413`, `415`, `422`).
 - Limits request bodies to 16 KiB and sends JSON responses with no-store cache headers.
-- Keeps data in an in-memory Map and assigns random UUIDs.
+- Assigns random UUIDs and uses in-memory storage by default, with **optional local JSON persistence** via `TASKS_FILE`.
 - No npm packages, API keys, cloud services or database required.
 
 ## Run locally
@@ -21,6 +21,25 @@ npm start
 ```
 
 The server listens at `http://127.0.0.1:3000`. Override with `PORT=4000 npm start` on macOS/Linux. The server binds to loopback only and is intended for local development.
+
+## Optional persistent storage
+
+By default tasks are held in memory and disappear when the server stops. To keep
+them between restarts, set `TASKS_FILE` to a writable JSON file path:
+
+```bash
+TASKS_FILE=./data/tasks.json npm start
+```
+
+This is intended for **single-process local development only**. Every create,
+update or delete atomically replaces the JSON snapshot using a temporary file,
+and startup validates existing data. If a snapshot is corrupted, startup fails
+instead of silently deleting it. Keep the data file outside version control
+(the `data/` folder is ignored). Back up important data separately.
+
+There is **no concurrent writer coordination, database, encryption, or user
+authentication**. Do not run multiple server instances against the same file,
+and do not expose this API to the public internet.
 
 ## API
 
@@ -55,16 +74,18 @@ When query parameters are supplied, the response includes `tasks` and `paginatio
 npm test
 ```
 
-The Node built-in test runner starts a temporary server on an ephemeral port and checks CRUD operations, validation, malformed JSON, request size limits and HTTP errors. GitHub Actions runs the same test suite on changes to this project.
+The Node built-in test runner starts temporary servers on ephemeral ports and checks CRUD operations, validation, malformed JSON, request size limits, HTTP errors, and file-store persistence/restart behavior. GitHub Actions runs the same test suite on changes to this project.
 
 ## Architecture
 
 - `src/app.mjs`: HTTP handler, validation, and injectable in-memory store
+- `src/file-store.mjs`: opt-in, single-process JSON snapshot store with atomic replacement
+- `tests/file-store.test.mjs`: persistence and HTTP restart regression tests
 - `src/server.mjs`: local server entrypoint
 - `tests/api.test.mjs`: HTTP integration tests using built-in `node:test` and `fetch`
 
 ## Limitations and next steps
 
-**Demo only.** All tasks disappear when the server restarts. There is no authentication, rate limiting, persistence, multi-user support or HTTPS termination. Do **not** expose this service to the public internet or store sensitive information.
+**Demo only.** Tasks disappear on restart unless `TASKS_FILE` is set. File persistence is not multi-writer safe. There is no authentication, rate limiting, multi-user support or HTTPS termination. Do **not** expose this service to the public internet or store sensitive information.
 
-Potential next improvements: persistent SQLite storage, pagination, OpenAPI documentation and authorization with a clear security model.
+Potential next improvements: replace JSON snapshots with SQLite transactions, add OpenAPI documentation, and implement authorization with a clear security model.

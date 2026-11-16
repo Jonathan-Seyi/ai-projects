@@ -1,0 +1,3 @@
+# Task API local persistence files (never commit personal task data)
+data/
+*.tmp
