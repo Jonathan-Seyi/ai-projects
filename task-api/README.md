@@ -76,8 +76,16 @@ npm test
 
 The Node built-in test runner starts temporary servers on ephemeral ports and checks CRUD operations, validation, malformed JSON, request size limits, HTTP errors, and file-store persistence/restart behavior. GitHub Actions runs the same test suite on changes to this project.
 
+## OpenAPI contract and contract tests
+
+The machine-readable [OpenAPI 3.0 specification](openapi.json) documents the local HTTP routes, request bodies, validation constraints, response schemas and error statuses. Import it into an OpenAPI-compatible viewer or API client to explore the service. The API is deliberately bound to loopback and has no authentication, so **do not expose it publicly**.
+
+Run `npm test` from this directory to execute the built-in Node.js tests. The new `tests/openapi.test.mjs` checks that local schema references resolve and compares live HTTP responses against the documented shapes. These checks cover representative CRUD, pagination and validation cases, not every possible request or a full third-party OpenAPI conformance suite.
+
 ## Architecture
 
+- `openapi.json`: OpenAPI 3.0 HTTP contract
+- `tests/openapi.test.mjs`: schema and live response contract checks
 - `src/app.mjs`: HTTP handler, validation, and injectable in-memory store
 - `src/file-store.mjs`: opt-in, single-process JSON snapshot store with atomic replacement
 - `tests/file-store.test.mjs`: persistence and HTTP restart regression tests
