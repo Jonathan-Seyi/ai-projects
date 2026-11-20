@@ -61,12 +61,27 @@ These tests cover the pure matching functions and AI result validation. They **d
 - `tests/test_match_core.py` — automated unit tests.
 - `.github/workflows/resume-match-tests.yml` (at the repository root) — Python CI.
 
+
+## Reproducible keyword evaluation
+
+The included `evaluation_cases.json` contains **synthetic, hand-labeled** technical text samples. It is a small regression benchmark, not a representative hiring dataset and not a measure of recruiting success.
+
+From the `ai-resume-match` directory, run:
+
+```bash
+python evaluate.py
+python -m unittest discover -s tests -v
+```
+
+The evaluation reports micro-averaged precision, recall and F1 of **extracted keywords** against expected tokens, plus per-case missing/unexpected terms. This does not evaluate whether a resume is suitable for a job. Add anonymized, independently reviewed examples before drawing broader conclusions.
+
 ## Limitations and roadmap
 
 - [x] Explain keyword coverage and preserve punctuation-heavy tech names.
 - [x] Add explicit consent before sending resume data to an external AI API.
 - [x] Add unit tests and CI.
-- [ ] Evaluate keyword recall on anonymized sample job postings.
+- [x] Add a small synthetic labeled keyword evaluation harness (not a real-world benchmark).
+- [ ] Evaluate on independently labeled, anonymized real job postings.
 - [x] Add curated multi-word skill phrases and explainable REST API synonym mappings.
 - [ ] Expand the skill phrase list based on measured results from anonymized job postings.
 - [ ] Add Streamlit UI smoke tests without sending private documents to an API.
